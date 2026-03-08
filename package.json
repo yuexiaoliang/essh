@@ -1,5 +1,5 @@
 {
-  "name": "eassh",
+  "name": "@yuexiaoliang1993/eassh",
   "type": "module",
   "version": "0.0.1",
   "packageManager": "pnpm@10.25.0",

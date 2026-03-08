@@ -6,7 +6,6 @@
 [![JSDocs][jsdocs-src]][jsdocs-href]
 [![License][license-src]][license-href]
 
-
 ## Note for Developers
 
 This starter recommands using [npm Trusted Publisher](https://github.com/e18e/ecosystem-issues/issues/201), where the release is done on CI to ensure the security of the packages.
@@ -29,13 +28,13 @@ Then for the future releases, you can run `pnpm run release` to do the release a
 
 <!-- Badges -->
 
-[npm-version-src]: https://img.shields.io/npm/v/eassh?style=flat&colorA=080f12&colorB=1fa669
-[npm-version-href]: https://npmjs.com/package/eassh
-[npm-downloads-src]: https://img.shields.io/npm/dm/eassh?style=flat&colorA=080f12&colorB=1fa669
-[npm-downloads-href]: https://npmjs.com/package/eassh
-[bundle-src]: https://img.shields.io/bundlephobia/minzip/eassh?style=flat&colorA=080f12&colorB=1fa669&label=minzip
-[bundle-href]: https://bundlephobia.com/result?p=eassh
+[npm-version-src]: https://img.shields.io/npm/v/@yuexiaoliang1993/eassh?style=flat&colorA=080f12&colorB=1fa669
+[npm-version-href]: https://npmjs.com/package/@yuexiaoliang1993/eassh
+[npm-downloads-src]: https://img.shields.io/npm/dm/@yuexiaoliang1993/eassh?style=flat&colorA=080f12&colorB=1fa669
+[npm-downloads-href]: https://npmjs.com/package/@yuexiaoliang1993/eassh
+[bundle-src]: https://img.shields.io/bundlephobia/minzip/@yuexiaoliang1993/eassh?style=flat&colorA=080f12&colorB=1fa669&label=minzip
+[bundle-href]: https://bundlephobia.com/result?p=@yuexiaoliang1993/eassh
 [license-src]: https://img.shields.io/github/license/yuexiaoliang/eassh.svg?style=flat&colorA=080f12&colorB=1fa669
 [license-href]: https://github.com/yuexiaoliang/eassh/blob/main/LICENSE
 [jsdocs-src]: https://img.shields.io/badge/jsdocs-reference-080f12?style=flat&colorA=080f12&colorB=1fa669
-[jsdocs-href]: https://www.jsdocs.io/package/eassh
+[jsdocs-href]: https://www.jsdocs.io/package/@yuexiaoliang1993/eassh
