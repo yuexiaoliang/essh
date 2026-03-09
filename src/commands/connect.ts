@@ -7,7 +7,7 @@ export async function connect(name?: string): Promise<void> {
   const servers = await loadServers()
 
   if (servers.length === 0) {
-    console.log(chalk.red('没有可用的服务器，请先运行 eassh add 添加服务器'))
+    console.log(chalk.red('没有可用的服务器，请先运行 essh add 添加服务器'))
     process.exit(1)
   }
 

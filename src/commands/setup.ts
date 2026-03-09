@@ -1,12 +1,12 @@
 import chalk from 'chalk'
-import { getPassword, loadGlobalConfig, loadServers } from '../core/config.js'
+import { expandHome, getPassword, loadGlobalConfig, loadServers } from '../core/config.js'
 import { pullRepo } from '../core/git.js'
 import { decryptAllKeys, updateSSHConfig } from '../core/ssh.js'
 
 export async function setup(): Promise<void> {
   const config = await loadGlobalConfig()
   if (!config) {
-    console.log(chalk.red('请先运行 eassh init 初始化配置'))
+    console.log(chalk.red('请先运行 essh init 初始化配置'))
     process.exit(1)
   }
 
@@ -15,7 +15,16 @@ export async function setup(): Promise<void> {
 
   console.log(chalk.green('✓ 正在解密密钥...'))
   const password = await getPassword()
-  await decryptAllKeys(config.repoPath, password)
+  const repoPath = expandHome(config.repoPath)
+
+  try {
+    await decryptAllKeys(repoPath, password)
+  }
+  catch (error) {
+    const errorMsg = error instanceof Error ? error.message : String(error)
+    console.log(chalk.red(`✗ ${errorMsg}`))
+    process.exit(1)
+  }
 
   console.log(chalk.green('✓ 正在生成 SSH config...'))
   const servers = await loadServers()
@@ -28,5 +37,5 @@ export async function setup(): Promise<void> {
     console.log(`  - ${server.name} (${server.host})${server.label ? ` - ${server.label}` : ''}`)
   }
 
-  console.log(chalk.cyan('\n运行 \'eassh connect\' 开始连接'))
+  console.log(chalk.cyan('\n运行 \'essh connect\' 开始连接'))
 }

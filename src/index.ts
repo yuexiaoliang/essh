@@ -6,14 +6,14 @@ import { add, connect, encrypt, init, list, remove, setup } from './commands/ind
 const program = new Command()
 
 program
-  .name('eassh')
+  .name('essh')
   .description('服务器配置管理中心')
   .version('0.0.1')
 
 program
   .command('init')
   .description('初始化配置，克隆私有仓库')
-  .option('-d, --dir <path>', '指定配置仓库克隆目录（默认：~/.eassh/cache）')
+  .option('-d, --dir <path>', '指定配置仓库克隆目录（默认：~/.essh/cache）')
   .action(init)
 
 program

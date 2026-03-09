@@ -3,11 +3,11 @@ import os from 'node:os'
 import path from 'node:path'
 import fs from 'fs-extra'
 
-const CONFIG_DIR = path.join(os.homedir(), '.eassh')
+const CONFIG_DIR = path.join(os.homedir(), '.essh')
 const CONFIG_FILE = path.join(CONFIG_DIR, 'config.json')
 const CACHE_DIR = path.join(CONFIG_DIR, 'cache')
 const SSH_DIR = path.join(os.homedir(), '.ssh')
-const EASSH_SSH_DIR = path.join(SSH_DIR, 'eassh')
+const ESSH_SSH_DIR = path.join(SSH_DIR, 'essh')
 
 export function getConfigDir(): string {
   return CONFIG_DIR
@@ -21,15 +21,15 @@ export function getSshDir(): string {
   return SSH_DIR
 }
 
-export function getEasshSshDir(): string {
-  return EASSH_SSH_DIR
+export function getEsshSshDir(): string {
+  return ESSH_SSH_DIR
 }
 
 export async function ensureConfigDir(): Promise<void> {
   await fs.ensureDir(CONFIG_DIR)
   await fs.ensureDir(CACHE_DIR)
   await fs.ensureDir(SSH_DIR)
-  await fs.ensureDir(EASSH_SSH_DIR)
+  await fs.ensureDir(ESSH_SSH_DIR)
 }
 
 export async function loadGlobalConfig(): Promise<GlobalConfig | null> {
@@ -69,10 +69,28 @@ export async function saveServers(servers: ServerConfig[]): Promise<void> {
   await fs.writeJson(serversFile, data, { spaces: 2 })
 }
 
+const PASSWORD_FILE = path.join(CONFIG_DIR, '.password')
+
 export async function getPassword(): Promise<string> {
-  const envPassword = process.env.EASSH_PASSWORD
-  if (envPassword)
+  // 1. 检查环境变量
+  const envPassword = process.env.ESSH_PASSWORD
+  if (envPassword) {
     return envPassword
+  }
+
+  // 2. 检查密码文件
+  try {
+    const exists = await fs.pathExists(PASSWORD_FILE)
+    if (exists) {
+      const password = await fs.readFile(PASSWORD_FILE, 'utf-8')
+      return password.trim()
+    }
+  }
+  catch {
+    // 读取失败，继续让用户输入
+  }
+
+  // 3. 提示用户输入
   const inquirer = await import('inquirer')
   const { password } = await inquirer.default.prompt([
     {
@@ -82,6 +100,15 @@ export async function getPassword(): Promise<string> {
       mask: '*',
     },
   ])
+
+  // 4. 保存密码到文件
+  try {
+    await fs.writeFile(PASSWORD_FILE, password, { mode: 0o600 })
+  }
+  catch (error) {
+    console.warn('警告：无法保存密码文件，每次操作都需要输入密码')
+  }
+
   return password
 }
 

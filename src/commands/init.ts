@@ -64,14 +64,14 @@ export async function init(options?: InitOptions): Promise<void> {
 
   const config: GlobalConfig = {
     repoUrl,
-    repoPath: options?.dir ? targetPath : '~/.eassh/cache',
+    repoPath: options?.dir ? targetPath : '~/.essh/cache',
     encrypted: true,
   }
 
   await saveGlobalConfig(config)
 
   console.log(chalk.green('✓ 设置完成！'))
-  console.log(chalk.cyan('\n现在可以运行 \'eassh setup\' 来解密密钥'))
+  console.log(chalk.cyan('\n现在可以运行 \'essh setup\' 来解密密钥'))
 }
 
 /**
@@ -104,19 +104,19 @@ async function generateDefaultConfig(targetPath: string): Promise<void> {
 \`\`\`bash
 # 1. 安装 Node.js
 # 2. 运行初始化
-npx eassh init
+npx essh init
 
 # 3. 解密配置
-npx eassh setup
+npx essh setup
 
 # 4. 连接服务器
-npx eassh connect
+npx essh connect
 \`\`\`
 
 ## 添加新服务器
 
 \`\`\`bash
-npx eassh add
+npx essh add
 \`\`\`
 
 ## 安全说明

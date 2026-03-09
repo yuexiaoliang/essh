@@ -3,9 +3,10 @@ import path from 'node:path'
 import chalk from 'chalk'
 import fs from 'fs-extra'
 import inquirer from 'inquirer'
-import { expandHome, getCacheDir, getPassword, loadServers, saveServers } from '../core/config.js'
-import { encryptFile } from '../core/crypto.js'
+import { expandHome, getCacheDir, getEsshSshDir, getPassword, loadServers, saveServers } from '../core/config.js'
+import { decryptFile, encryptFile } from '../core/crypto.js'
 import { addAndCommit, pushRepo } from '../core/git.js'
+import { updateSSHConfig } from '../core/ssh.js'
 
 export async function add(): Promise<void> {
   const servers = await loadServers()
@@ -101,7 +102,7 @@ export async function add(): Promise<void> {
   if (keyOption === 'generate') {
     console.log(chalk.cyan('正在生成 SSH 密钥...'))
     try {
-      execSync(`ssh-keygen -t ed25519 -f "${privateKeyPath}" -N "" -C "eassh-${name}"`, { stdio: 'inherit' })
+      execSync(`ssh-keygen -t ed25519 -f "${privateKeyPath}" -N "" -C "essh-${name}"`, { stdio: 'inherit' })
       console.log(chalk.green('✓ SSH 密钥已生成'))
     }
     catch (error) {
@@ -147,6 +148,9 @@ export async function add(): Promise<void> {
     console.log(chalk.cyan('\n公钥内容 (需要添加到服务器的 ~/.ssh/authorized_keys):'))
     const pubKeyContent = await fs.readFile(publicKeyPath, 'utf-8')
     console.log(chalk.yellow(pubKeyContent.trim()))
+    console.log(chalk.cyan('\n添加公钥到服务器的方法：'))
+    console.log(chalk.white(`方法1 (推荐): ssh-copy-id -f -i ~/.essh/cache/keys/${keyFileName}.pub ${user}@${host}`))
+    console.log(chalk.white(`方法2: 登录服务器后执行: echo "${pubKeyContent.trim()}" >> ~/.ssh/authorized_keys`))
   }
 
   const newServer = {
@@ -167,5 +171,63 @@ export async function add(): Promise<void> {
   await pushRepo(cacheDir)
 
   console.log(chalk.green('✓ 推送到远程仓库'))
-  console.log(chalk.cyan('\n运行 \'eassh setup\' 更新本地配置'))
+
+  console.log(chalk.cyan('\n正在解密密钥并配置 SSH...'))
+  const esshDir = getEsshSshDir()
+  await fs.ensureDir(esshDir)
+  const decryptedKeyPath = path.join(esshDir, keyFileName)
+  await decryptFile(encryptedKeyPath, password, decryptedKeyPath)
+  await fs.chmod(decryptedKeyPath, 0o600)
+
+  await updateSSHConfig(servers)
+
+  console.log(chalk.green('✓ 本地配置已更新'))
+
+  // 读取公钥内容用于显示
+  let pubKeyContent = ''
+  if (await fs.pathExists(publicKeyPath)) {
+    pubKeyContent = await fs.readFile(publicKeyPath, 'utf-8')
+  }
+
+  // 询问是否自动添加公钥到服务器
+  const { shouldAddKey } = await inquirer.prompt([
+    {
+      type: 'confirm',
+      name: 'shouldAddKey',
+      message: '是否自动将公钥添加到服务器？',
+      default: true,
+    },
+  ])
+
+  if (shouldAddKey) {
+    const { serverPassword } = await inquirer.prompt([
+      {
+        type: 'password',
+        name: 'serverPassword',
+        message: `请输入 ${user}@${host} 的密码：`,
+        mask: '*',
+      },
+    ])
+
+    console.log(chalk.cyan('正在添加公钥到服务器...'))
+    try {
+      // 使用 sshpass 或 expect 来自动输入密码执行 ssh-copy-id
+      const { execSync } = await import('node:child_process')
+      const sshCopyIdCmd = `sshpass -p '${serverPassword}' ssh-copy-id -f -o StrictHostKeyChecking=no -i ${publicKeyPath} ${user}@${host}`
+      execSync(sshCopyIdCmd, { stdio: 'inherit' })
+      console.log(chalk.green('✓ 公钥已添加到服务器'))
+      console.log(chalk.cyan('\n现在可以运行 \'essh connect\' 免密连接服务器'))
+    }
+    catch {
+      console.log(chalk.yellow('自动添加失败，请手动添加公钥：'))
+      console.log(chalk.white(`方法1: ssh-copy-id -f -i ~/.essh/cache/keys/${keyFileName}.pub ${user}@${host}`))
+      console.log(chalk.white(`方法2: 登录服务器后执行: echo "${pubKeyContent.trim()}" >> ~/.ssh/authorized_keys`))
+    }
+  }
+  else {
+    console.log(chalk.cyan('\n可以运行 \'essh connect\' 连接服务器（首次需要输入密码）'))
+    console.log(chalk.cyan('\n或者手动添加公钥到服务器：'))
+    console.log(chalk.white(`方法1: ssh-copy-id -f -i ~/.essh/cache/keys/${keyFileName}.pub ${user}@${host}`))
+    console.log(chalk.white(`方法2: 登录服务器后执行: echo "${pubKeyContent.trim()}" >> ~/.ssh/authorized_keys`))
+  }
 }

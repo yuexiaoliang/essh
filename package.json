@@ -1,18 +1,18 @@
 {
-  "name": "@yuexiaoliang1993/eassh",
+  "name": "@yuexiaoliang1993/essh",
   "type": "module",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "packageManager": "pnpm@10.25.0",
   "description": "",
   "author": "岳晓亮 <hi@yuexiaoliang.com>",
   "license": "MIT",
   "funding": "https://github.com/sponsors/yuexiaoliang",
-  "homepage": "https://github.com/yuexiaoliang/eassh#readme",
+  "homepage": "https://github.com/yuexiaoliang/essh#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yuexiaoliang/eassh.git"
+    "url": "git+https://github.com/yuexiaoliang/essh.git"
   },
-  "bugs": "https://github.com/yuexiaoliang/eassh/issues",
+  "bugs": "https://github.com/yuexiaoliang/essh/issues",
   "keywords": [],
   "sideEffects": false,
   "exports": {
@@ -23,7 +23,7 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.mts",
   "bin": {
-    "eassh": "./dist/index.mjs"
+    "essh": "dist/index.mjs"
   },
   "files": [
     "dist"

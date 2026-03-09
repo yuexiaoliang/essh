@@ -1,4 +1,4 @@
-# eassh - 服务器配置管理中心（完整需求文档）
+# essh - 服务器配置管理中心（完整需求文档）
 
 ## 项目概述
 
@@ -8,7 +8,7 @@
 - **通用工具**：发布到 NPM，所有人可用（开源）
 - **私有配置**：存储在私有 Git 仓库，包含加密密钥和服务器列表
 
-**项目名称：** `eassh`（easy + ssh，简单、跨平台、易用）
+**项目名称：** `essh`（easy + ssh，简单、跨平台、易用）
 
 ---
 
@@ -17,7 +17,7 @@
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                    NPM 包（公开）                        │
-│  @yuexiaoliang/eassh                                    │
+│  @yuexiaoliang1993/essh                                  │
 │                                                         │
 │  功能：                                                 │
 │  - 加解密逻辑（age）                                    │
@@ -26,20 +26,20 @@
 │  - Git 仓库操作                                         │
 │                                                         │
 │  命令：                                                 │
-│  - npx eassh init                                       │
-│  - npx eassh setup                                      │
-│  - npx eassh connect                                    │
-│  - npx eassh list                                       │
-│  - npx eassh add                                        │
-│  - npx eassh encrypt                                    │
+│  - npx essh init                                       │
+│  - npx essh setup                                      │
+│  - npx essh connect                                    │
+│  - npx essh list                                       │
+│  - npx essh add                                        │
+│  - npx essh encrypt                                    │
 └─────────────────────────────────────────────────────────┘
                             ↓ 读取配置
 ┌─────────────────────────────────────────────────────────┐
 │                  私有仓库（你的配置）                    │
-│  github.com/yuexiaoliang/eassh-config                   │
+│  github.com/yuexiaoliang/essh-config                   │
 │                                                         │
 │  内容：                                                 │
-│  - .eassh.json (工具配置)                               │
+│  - .essh.json (工具配置)                               │
 │  - keys/*.age (加密的密钥)                              │
 │  - servers.json (服务器列表)                            │
 │  - README.md (个人使用说明)                             │
@@ -54,8 +54,8 @@
 
 | 字段 | 值 |
 |------|-----|
-| 包名 | `@yuexiaoliang/eassh` |
-| 命令名 | `eassh` |
+| 包名 | `@yuexiaoliang1993/essh` |
+| 命令名 | `essh` |
 | 运行时 | Node.js v18+ |
 | 语言 | TypeScript |
 | 发布 | NPM Registry |
@@ -83,7 +83,7 @@
 ### 项目结构
 
 ```
-eassh/
+essh/
 ├── package.json
 ├── tsconfig.json
 ├── README.md
@@ -109,52 +109,52 @@ eassh/
 
 ### CLI 命令设计
 
-#### `eassh init` - 初始化配置
+#### `essh init` - 初始化配置
 
 **用途：** 在新机器上首次使用，配置私有仓库地址
 
 **交互流程：**
 ```bash
-$ npx eassh init
+$ npx essh init
 
 ? 请输入你的私有配置仓库地址 (GitHub/GitLab)
-> git@github.com:yuexiaoliang/eassh-config.git
+> git@github.com:yuexiaoliang/essh-config.git
 
 ? 请输入加密密码（用于解密密钥）
 > [隐藏输入]
 
 ✓ 克隆配置仓库成功
-✓ 创建配置文件 ~/.eassh/config.json
+✓ 创建配置文件 ~/.essh/config.json
 ✓ 设置完成！
 
-现在可以运行 'eassh setup' 来解密密钥
+现在可以运行 'essh setup' 来解密密钥
 ```
 
-**生成的配置：** `~/.eassh/config.json`
+**生成的配置：** `~/.essh/config.json`
 ```json
 {
-  "repoUrl": "git@github.com:yuexiaoliang/eassh-config.git",
-  "repoPath": "~/.eassh/cache",
+  "repoUrl": "git@github.com:yuexiaoliang/essh-config.git",
+  "repoPath": "~/.essh/cache",
   "encrypted": true
 }
 ```
 
 ---
 
-#### `eassh setup` - 解密并配置 SSH
+#### `essh setup` - 解密并配置 SSH
 
 **用途：** 解密所有密钥，配置 SSH config
 
 **流程：**
-1. 读取 `~/.eassh/config.json`
+1. 读取 `~/.essh/config.json`
 2. 从缓存目录读取 `servers.json` 和 `keys/*.age`
-3. 解密所有密钥到 `~/.ssh/eassh/`
+3. 解密所有密钥到 `~/.ssh/essh/`
 4. 生成/更新 `~/.ssh/config`
 5. 设置正确的文件权限
 
 **输出：**
 ```bash
-$ npx eassh setup
+$ npx essh setup
 
 ✓ 解密 3 个密钥
 ✓ 生成 SSH config
@@ -165,18 +165,18 @@ $ npx eassh setup
   - vps (45.32.100.1)
   - work (10.0.0.50)
 
-运行 'eassh connect' 开始连接
+运行 'essh connect' 开始连接
 ```
 
 ---
 
-#### `eassh connect [name]` - 连接服务器
+#### `essh connect [name]` - 连接服务器
 
 **用途：** 交互式选择或直接连接指定服务器
 
 **模式 1：交互式选择**
 ```bash
-$ npx eassh connect
+$ npx essh connect
 
 ? 选择要连接的服务器
 ❯ home (192.168.1.100)
@@ -188,17 +188,17 @@ Connecting to home (192.168.1.100)...
 
 **模式 2：直接连接**
 ```bash
-$ npx eassh connect home
+$ npx essh connect home
 
 Connecting to home (192.168.1.100)...
 ```
 
 ---
 
-#### `eassh list` - 列出服务器
+#### `essh list` - 列出服务器
 
 ```bash
-$ npx eassh list
+$ npx essh list
 
 服务器列表 (共 3 个):
 
@@ -210,11 +210,11 @@ $ npx eassh list
 
 ---
 
-#### `eassh add` - 添加新服务器
+#### `essh add` - 添加新服务器
 
 **交互式添加：**
 ```bash
-$ npx eassh add
+$ npx essh add
 
 ? 服务器名称 (英文标识)
 > new-server
@@ -244,12 +244,12 @@ $ npx eassh add
 
 ---
 
-#### `eassh encrypt` - 重新加密
+#### `essh encrypt` - 重新加密
 
 **用途：** 修改配置后重新加密并推送
 
 ```bash
-$ npx eassh encrypt
+$ npx essh encrypt
 
 ✓ 加密 3 个密钥文件
 ✓ 提交更改到本地仓库
@@ -313,10 +313,10 @@ export async function pushRepo(path: string): Promise<void>
 ### 仓库结构
 
 ```
-eassh-config/
+essh-config/
 ├── .gitignore
 ├── README.md
-├── .eassh.json          # 仓库配置（可选）
+├── .essh.json          # 仓库配置（可选）
 ├── keys/
 │   ├── home.key.age
 │   ├── vps.key.age
@@ -377,13 +377,13 @@ Thumbs.db
 ```bash
 # 1. 安装 Node.js
 # 2. 运行初始化
-npx eassh init
+npx essh init
 
 # 3. 解密配置
-npx eassh setup
+npx essh setup
 
 # 4. 连接服务器
-npx eassh connect
+npx essh connect
 ```
 
 ## 服务器列表
@@ -396,7 +396,7 @@ npx eassh connect
 ## 添加新服务器
 
 ```bash
-npx eassh add
+npx essh add
 ```
 
 ## 安全说明
@@ -417,22 +417,22 @@ npx eassh add
 node -v
 
 # 2. 初始化工具（配置仓库地址和密码）
-npx eassh init
+npx essh init
 
 # 3. 解密并配置 SSH
-npx eassh setup
+npx essh setup
 
 # 4. 连接服务器
-npx eassh connect
+npx essh connect
 # 或
-npx eassh connect home
+npx essh connect home
 ```
 
 ### 场景 2：添加新服务器
 
 ```bash
 # 1. 添加服务器（交互式）
-npx eassh add
+npx essh add
 
 # 2. 工具会自动：
 #    - 更新 servers.json
@@ -446,13 +446,13 @@ npx eassh add
 
 ```bash
 # 1. 进入缓存目录
-cd ~/.eassh/cache
+cd ~/.essh/cache
 
 # 2. 编辑 servers.json
 vim servers.json
 
 # 3. 重新加密并推送
-npx eassh encrypt
+npx essh encrypt
 ```
 
 ---
@@ -464,7 +464,7 @@ npx eassh encrypt
 | 状态 | 位置 | 权限 |
 |------|------|------|
 | 加密后 | Git 仓库 `keys/*.age` | 644 |
-| 解密后 | `~/.ssh/eassh/*.key` | 600 |
+| 解密后 | `~/.ssh/essh/*.key` | 600 |
 | SSH config | `~/.ssh/config` | 600 |
 
 ### 加密方式
@@ -477,8 +477,8 @@ npx eassh encrypt
 
 ```bash
 # 可选：通过环境变量提供密码（适合脚本）
-export EASSH_PASSWORD="my-secret-password"
-npx eassh setup
+export ESSH_PASSWORD="my-secret-password"
+npx essh setup
 ```
 
 ---
@@ -527,7 +527,7 @@ npm test
 npm publish --access public
 
 # 4. 全局安装测试
-npm install -g @yuexiaoliang/eassh
+npm install -g @yuexiaoliang1993/essh
 ```
 
 ### 版本管理
@@ -609,4 +609,4 @@ npm install -g @yuexiaoliang/eassh
 **文档版本：** 3.0
 **创建日期：** 2026-03-08
 **作者：** 菜鸡小岳子
-**项目名称：** eassh
+**项目名称：** essh

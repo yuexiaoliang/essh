@@ -2,7 +2,7 @@ import path from 'node:path'
 import chalk from 'chalk'
 import fs from 'fs-extra'
 import inquirer from 'inquirer'
-import { getCacheDir, loadServers, saveServers } from '../core/config.js'
+import { getCacheDir, getEsshSshDir, loadServers, saveServers } from '../core/config.js'
 import { addAndCommit, pushRepo } from '../core/git.js'
 
 export async function remove(name: string): Promise<void> {
@@ -53,13 +53,33 @@ export async function remove(name: string): Promise<void> {
 
   const cacheDir = getCacheDir()
   const keysDir = path.join(cacheDir, 'keys')
+  const esshDir = getEsshSshDir()
 
   if (serverToRemove.key) {
     const keyPath = path.join(cacheDir, serverToRemove.key)
+    const keyName = path.basename(serverToRemove.key, '.age')
+    const pubKeyPath = path.join(keysDir, `${keyName}.pub`)
+    const localKeyPath = path.join(esshDir, keyName)
+
+    // 删除加密的密钥文件
     const keyExists = await fs.pathExists(keyPath)
     if (keyExists) {
       await fs.remove(keyPath)
-      console.log(chalk.green(`✓ 已删除密钥文件`))
+      console.log(chalk.green(`✓ 已删除加密密钥文件`))
+    }
+
+    // 删除公钥文件
+    const pubKeyExists = await fs.pathExists(pubKeyPath)
+    if (pubKeyExists) {
+      await fs.remove(pubKeyPath)
+      console.log(chalk.green(`✓ 已删除公钥文件`))
+    }
+
+    // 删除本地解密的密钥
+    const localKeyExists = await fs.pathExists(localKeyPath)
+    if (localKeyExists) {
+      await fs.remove(localKeyPath)
+      console.log(chalk.green(`✓ 已删除本地解密密钥`))
     }
   }
 
