@@ -55,4 +55,12 @@ program
   .description('删除服务器')
   .action(remove)
 
+program.on('command:*', async (operands) => {
+  const command = operands[0]
+  if (command) {
+    // 未知命令视为服务器名，尝试连接
+    await connect(command)
+  }
+})
+
 program.parse()

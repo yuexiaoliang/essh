@@ -8,6 +8,9 @@ import { decryptFile, encryptFile } from '../core/crypto.js'
 import { addAndCommit, pushRepo } from '../core/git.js'
 import { updateSSHConfig } from '../core/ssh.js'
 
+// 内置命令列表，服务器名称不能与这些命令重复
+const RESERVED_NAMES = ['init', 'setup', 'connect', 'list', 'add', 'encrypt', 'remove', 'help', '-v', '--version']
+
 export async function add(): Promise<void> {
   const servers = await loadServers()
 
@@ -21,6 +24,8 @@ export async function add(): Promise<void> {
           return '请输入服务器名称'
         if (servers.some(s => s.name === input))
           return '服务器名称已存在'
+        if (RESERVED_NAMES.includes(input.toLowerCase()))
+          return '不能使用内置命令名称作为服务器名'
         if (!/^[a-z0-9-]+$/.test(input))
           return '只能使用小写字母、数字和连字符'
         return true
